@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f0f10" />
+<title>Transfer</title>
+<link rel="manifest" href="/manifest.json" />
+<style>
+  :root {
+    --bg: #0f0f10;
+    --card: rgba(32, 32, 34, 0.86);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #f2f2f2;
+    --muted: #a0a0a0;
+    --faint: #5c5c5c;
+    --accent-soft: #2a2a2c;
+    --sent: #b4a7ff;
+    --recv: #8fe0a3;
+    --warn: #ffb545;
+    --ok: #6fd38a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(124, 92, 255, 0.18), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(74, 214, 255, 0.10), transparent 50%),
+      var(--bg);
+  }
+  .wrap { padding: 20px 16px calc(24px + env(safe-area-inset-bottom)); max-width: 540px; margin: 0 auto; }
+  header { display: flex; align-items: center; gap: 10px; padding: 6px 2px 18px; }
+  .dot { width: 14px; height: 14px; border-radius: 5px; background: linear-gradient(135deg, var(--sent), var(--recv)); box-shadow: 0 0 20px rgba(180, 167, 255, 0.4); }
+  h1 { margin: 0; font-size: 19px; letter-spacing: -0.3px; font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; backdrop-filter: blur(20px); }
+  .card h2 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+  .muted { color: var(--muted); font-size: 12px; margin: 0; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--text);
+    color: var(--bg);
+    font-family: inherit;
+  }
+  .btn:active { opacity: 0.85; }
+  .btn.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn:disabled { opacity: 0.4; }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    padding: 10px 12px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--border-strong); }
+  .list { list-style: none; padding: 0; margin: 10px 0 0; }
+  .item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #ffffff06;
+    margin-bottom: 6px;
+    text-decoration: none; color: var(--text);
+  }
+  .item:active { background: #ffffff10; }
+  .icon { width: 32px; height: 32px; border-radius: 9px; background: rgba(143, 224, 163, 0.18); color: var(--recv); display: grid; place-items: center; font-weight: 700; flex-shrink: 0; font-size: 15px; }
+  .icon.text { background: rgba(255, 181, 69, 0.18); color: var(--warn); }
+  .name { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .size { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .empty { text-align: center; padding: 12px; color: var(--muted); font-size: 12.5px; }
+  input[type=file] { display: none; }
+  .toast {
+    position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+    background: var(--ok); color: #0b0b0f; padding: 10px 18px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; transition: opacity 200ms, transform 200ms;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .progress { margin-top: 10px; height: 4px; background: #ffffff10; border-radius: 2px; overflow: hidden; display: none; }
+  .progress .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--sent), var(--recv)); transition: width 150ms; }
+  .progress.show { display: block; }
+  .status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-left: auto; }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .text-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border-radius: 10px; background: #ffffff06; margin-bottom: 6px; }
+  .text-body { flex: 1; min-width: 0; font-size: 13px; word-break: break-word; }
+  .text-copy { background: var(--accent-soft); border: 0; color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="dot"></div>
+    <h1>Transfer</h1>
+    <div class="status"><span class="pulse"></span>conectado</div>
+  </header>
+
+  <section class="card">
+    <h2>Enviar pro PC</h2>
+    <p class="muted">Fotos, vídeos, qualquer arquivo. Sem passar por nuvem.</p>
+    <input type="file" id="file" multiple />
+    <button class="btn" onclick="document.getElementById('file').click()">Escolher arquivos</button>
+    <div class="progress" id="prog"><div class="bar" id="bar"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>Enviar texto ou link</h2>
+    <p class="muted">Mande senha, código SMS, URL — direto pro PC.</p>
+    <textarea id="txt" placeholder="Cole ou digite aqui..."></textarea>
+    <button class="btn" id="btnTxt" onclick="sendText()">Enviar texto</button>
+  </section>
+
+  <section class="card">
+    <h2>Receber do PC</h2>
+    <p class="muted">Arquivos e textos que o PC envia aparecem aqui.</p>
+    <ul class="list" id="list"></ul>
+    <button class="btn ghost" onclick="refresh()">Atualizar</button>
+  </section>
+</div>
+
+<div class="toast" id="toast">Enviado</div>
+
+<script>
+  const fileInput = document.getElementById("file");
+  const list = document.getElementById("list");
+  const toast = document.getElementById("toast");
+  const prog = document.getElementById("prog");
+  const bar = document.getElementById("bar");
+  const txt = document.getElementById("txt");
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+  function fmtSize(b) {
+    if (b < 1024) return b + " B";
+    if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
+    if (b < 1073741824) return (b / 1048576).toFixed(1) + " MB";
+    return (b / 1073741824).toFixed(2) + " GB";
+  }
+
+  fileInput.addEventListener("change", async () => {
+    const files = Array.from(fileInput.files || []);
+    if (!files.length) return;
+    const form = new FormData();
+    for (const f of files) form.append("file", f, f.name);
+    prog.classList.add("show");
+    bar.style.width = "0%";
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/upload");
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable) bar.style.width = ((e.loaded / e.total) * 100) + "%"; };
+      xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(xhr.status));
+      xhr.onerror = () => reject(new Error("rede"));
+      xhr.send(form);
+    }).then(() => {
+      showToast(files.length === 1 ? "1 arquivo enviado" : files.length + " arquivos enviados");
+      fileInput.value = "";
+    }).catch(() => showToast("Falhou. Tente de novo."));
+    setTimeout(() => prog.classList.remove("show"), 400);
+  });
+
+  async function sendText() {
+    const value = txt.value.trim();
+    if (!value) return;
+    try {
+      await fetch("/api/text", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: value }) });
+      showToast("Texto enviado");
+      txt.value = "";
+    } catch { showToast("Falhou"); }
+  }
+
+  async function copyText(text, btn) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const old = btn.textContent;
+      btn.textContent = "Copiado";
+      setTimeout(() => btn.textContent = old, 1500);
+    } catch { showToast("Não deu pra copiar"); }
+  }
+
+  async function claimText(id) {
+    try { await fetch("/api/text/claim/" + id, { method: "POST" }); } catch {}
+  }
+
+  async function refresh() {
+    try {
+      const r = await fetch("/api/list");
+      const data = await r.json();
+      const files = data.files || [];
+      const texts = data.texts || [];
+      list.innerHTML = "";
+      if (!files.length && !texts.length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "Nada pra receber agora.";
+        list.appendChild(li);
+        return;
+      }
+      for (const it of texts) {
+        const li = document.createElement("li");
+        li.className = "text-item";
+        li.innerHTML = `
+          <div class="icon text">T</div>
+          <div class="text-body"></div>
+          <button class="text-copy">Copiar</button>
+        `;
+        li.querySelector(".text-body").textContent = it.text;
+        const btn = li.querySelector(".text-copy");
+        btn.onclick = async () => {
+          await copyText(it.text, btn);
+          await claimText(it.id);
+          setTimeout(refresh, 300);
+        };
+        list.appendChild(li);
+      }
+      for (const it of files) {
+        const a = document.createElement("a");
+        a.className = "item";
+        a.href = "/api/download/" + it.id;
+        a.download = it.name;
+        a.innerHTML = `
+          <div class="icon">↓</div>
+          <div style="min-width:0;flex:1">
+            <div class="name"></div>
+            <div class="size">${fmtSize(it.size)}</div>
+          </div>
+        `;
+        a.querySelector(".name").textContent = it.name;
+        list.appendChild(a);
+      }
+    } catch (e) {
+      showToast("Sem conexão com o PC.");
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 3000);
+</script>
+</body>
+</html>

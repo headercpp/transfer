@@ -1,0 +1,61 @@
+{
+  "name": "transfer",
+  "version": "0.1.0",
+  "description": "Transfira arquivos e textos entre seu celular e seu PC sem cabos. Funciona na rede local ou pela internet via túnel seguro.",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "electron": "tsc -p tsconfig.electron.json && electron .",
+    "icons": "powershell -ExecutionPolicy Bypass -File build/makeIcon.ps1 && node build/makeIco.cjs",
+    "build": "vite build && tsc -p tsconfig.electron.json && electron-builder",
+    "start": "npm run dev"
+  },
+  "author": "krustyx2020",
+  "license": "MIT",
+  "dependencies": {
+    "framer-motion": "^11.0.0",
+    "qrcode": "^1.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0",
+    "png-to-ico": "^3.0.2",
+    "typescript": "^5.4.0",
+    "vite": "^5.2.0"
+  },
+  "build": {
+    "appId": "com.krustyx2020.transfer",
+    "productName": "Transfer",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "mobile/**/*",
+      "build/icon.*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
+    }
+  },
+  "allowScripts": {
+    "electron@30.5.1": true,
+    "esbuild@0.21.5": true
+  }
+}
