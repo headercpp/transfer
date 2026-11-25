@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1a1c"/>
+      <stop offset="1" stop-color="#2d2d30"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#9a9aa0"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b4a7ff"/>
+      <stop offset="1" stop-color="#8fe0a3"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- subtle accent glow -->
+  <circle cx="256" cy="256" r="160" fill="url(#accent)" opacity="0.08"/>
+
+  <!-- up arrow (left) -->
+  <g filter="url(#softShadow)" opacity="0.35">
+    <path d="M186 356 L186 196 M186 196 L136 246 M186 196 L236 246"
+          stroke="url(#fg)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M186 356 L186 196 M186 196 L136 246 M186 196 L236 246"
+        stroke="url(#fg)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- down arrow (right) -->
+  <g filter="url(#softShadow)" opacity="0.35">
+    <path d="M326 156 L326 316 M326 316 L276 266 M326 316 L376 266"
+          stroke="url(#fg)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M326 156 L326 316 M326 316 L276 266 M326 316 L376 266"
+        stroke="url(#fg)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
