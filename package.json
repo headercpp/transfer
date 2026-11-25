@@ -10,7 +10,7 @@
     "build": "vite build && tsc -p tsconfig.electron.json && electron-builder",
     "start": "npm run dev"
   },
-  "author": "krustyx2020",
+  "author": "EduX",
   "license": "MIT",
   "dependencies": {
     "framer-motion": "^11.0.0",
@@ -31,7 +31,7 @@
     "vite": "^5.2.0"
   },
   "build": {
-    "appId": "com.krustyx2020.transfer",
+    "appId": "com.edux.transfer",
     "productName": "Transfer",
     "directories": {
       "output": "release"
@@ -44,7 +44,8 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.ico",
+      "publisherName": "EduX"
     },
     "nsis": {
       "oneClick": true,
